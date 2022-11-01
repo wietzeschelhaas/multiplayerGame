@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "outDir": "lib",
+        "target": "es6",
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "experimentalDecorators": true
+    },
+    "include": [
+        "src"
+    ]
+}

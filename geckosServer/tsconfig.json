@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "node16",
+    "rootDir": "src",
+    "outDir": "dist",
+    "allowJs": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+	"references": [
+        { "path": "../common" }
+    ],
+  "include": [
+    "src/**/*"
+  ]
+}
