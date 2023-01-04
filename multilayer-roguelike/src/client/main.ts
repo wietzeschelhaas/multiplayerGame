@@ -4,11 +4,13 @@ import Preloader from './scenes/Preloader'
 import game from './scenes/Game'
 import GameUI from './scenes/GameUI'
 
+import {width,height } from '../../../common/consts'
+
 
 export default new Phaser.Game({
 	type: Phaser.AUTO,
-	width: 800,
-	height: 450,
+	width: width,
+	height: height,
 	physics: {
 		default: 'arcade',
 		arcade: {

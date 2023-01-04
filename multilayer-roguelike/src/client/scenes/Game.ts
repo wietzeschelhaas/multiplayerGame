@@ -6,7 +6,6 @@ import { createLizardAnims } from '../anims/EnemyAnims'
 import { createCharacterAnims } from '../anims/CharacterAnims'
 import { createChestAnims } from '../anims/TreasureAnims'
 
-
 import NetworkedPLayer from '../characters/NetworkPlayer'
 import Player from '../characters/Player';
 import { ClientChannel } from '@geckos.io/client';

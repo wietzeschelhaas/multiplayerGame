@@ -1,0 +1,6 @@
+{
+  "type": "commonjs",
+  "dependencies": {
+    "@mikewesthad/dungeon": "^2.0.1"
+  }
+}

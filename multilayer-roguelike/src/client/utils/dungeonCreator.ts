@@ -1,19 +1,12 @@
-import Phaser from "phaser";
-import Dungeon, { Room } from "@mikewesthad/dungeon";
+import Phaser, { Physics } from "phaser";
 import Chest from '../items/Chest'
+
+import {createDungeon} from '../../../../common/dungeonUtils'
+
+import {tileSize, halfTileSize } from "../../../../common/dist/consts";
 const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
     
-    const dungeon = new Dungeon({
-        width: 200,
-        height: 200,
-        doorPadding: 3,
-        randomSeed:randomSeed,
-        rooms: {
-            width: { min: 30, max: 30 },
-            height: { min: 30, max: 30 },
-            maxRooms: 4,
-        }
-    });
+    const dungeon = createDungeon(randomSeed)
 
     // Create a blank map
     const map = scene.make.tilemap({
@@ -65,6 +58,8 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
 
     //const mappedTiles = dungeon.getMappedTiles({ empty: empty, floor: floor, door: floor, wall: wall })
 
+    console.log(dungeon)
+
     //groundLayer.fill(floor)
     dungeon.rooms.forEach(room => {
         const { x, y, width, height, left, right, top, bottom } = room;
@@ -78,7 +73,17 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
 
         wallLayer.fill(bottomWall, left + 1, top + 1, width - 2, 1); // Top
 
+       // var r2 = scene.add.rectangle(((left + 1) * 16) + (width-2) * 8, ((top + 1)*16) + 8, (width - 2)*16, 1 * 16,0x6666ff); // Top
+
+        //scene.physics.add.existing(r2,true)
+
         wallLayer.fill(leftWall, left + 1, top + 1, 1, height - 2); // Left
+
+        //var r3 = scene.add.rectangle(((left + 1)*16) + 8, ((top + 1)*16)+ (height-2) * 8, 16, (height - 2)*16,0x6666ff); // Left
+
+        //scene.physics.add.existing(r3,true)
+
+
         wallLayer.fill(rightWall, right, top + 1, 1, height - 2); // Right
         wallLayer.fill(bottomWall, left + 2, bottom, width - 3, 1); // Bottom
 
@@ -112,9 +117,55 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
 
         const X = stuffLayer.tileToWorldX(room.centerX)
         const Y = stuffLayer.tileToWorldY(room.centerY)
+
+        var r1 = scene.add.rectangle(X+50, Y, 40, 40, 0x6666ff);
+        scene.physics.add.existing(r1,true)
+
+        
         chests.get(X, Y, 'treasureAtlas', 'chest_empty_open_anim_f0.png')
 
     });
+
+    var mappedTiles = dungeon.getMappedTiles({
+        empty: 0,
+        floor: 1,
+        door: 2,
+        wall: 3
+    });
+
+    dungeon.rooms.forEach(room => {
+        const { x, y, width, height, left, right, top, bottom } = room;
+       
+        const doors = room.getDoorLocations(); // → Returns an array of {x, y} objects
+
+        for (var i = 0; i < doors.length; i++) {
+            if (doors[i].y === 0) {
+                var leftOfDoor = scene.add.rectangle(((left) * 16) + ((doors[i].x) * 8) + 8 , ((top + 1) * 16) + 8, (doors[i].x -1) * 16, 1 * 16, 0x6666ff); // Top
+                var rightOfdoor = scene.add.rectangle(doors[i].x * 16 + ((doors[i].x) * 8) + 8 , ((top + 1) * 16) + 8, (width - (doors[i].x -1)) * 16, 1 * 16, 0x6666ff); // Top
+                //TODO continue here
+                console.log(doors[i]) 
+                console.log(room)
+                console.log(tileSize)
+                scene.physics.add.existing(leftOfDoor, true)
+
+                // var r2 = scene.add.rectangle(((left + 1) * 16) + (width-2) * 8, ((top + 1)*16) + 8, (width - 2)*16, 1 * 16,0x6666ff); // Top
+            }
+        }
+        
+    });
+    
+    /*dungeon.tiles.forEach((row,rowIndex) => {
+        row.forEach((col, colIndex) => {
+            if(mappedTiles[colIndex][rowIndex] == 3){
+
+                let halfTileSize = 16 / 2
+                var r2 = scene.add.rectangle((rowIndex * 16) + halfTileSize , (colIndex *16) + halfTileSize, 16, 16, 0x6666ff); // Top
+
+                scene.physics.add.existing(r2, true)
+                console.log(dungeon.getRoomAt(rowIndex,colIndex));
+            }
+        })
+    });*/
 
     wallLayer.setCollisionByExclusion([-1, floor]);
     return { wallLayer: wallLayer, chests: chests, dungeonRooms: dungeon.rooms }
