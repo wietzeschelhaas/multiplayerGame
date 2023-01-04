@@ -3,10 +3,14 @@ import express from 'express'
 import http from 'http'
 import cors from 'cors'
 
-import Dungeon, { Room } from "@mikewesthad/dungeon";
+import {width,height } from '../../common/consts'
 
-import {State} from '../../common/stateContract'
+import state = require('../../common/dist/stateContract.js')
 
+import createDungeon = require('../../common/dungeonUtils')
+import { ArcadePhysics } from 'arcade-physics'
+
+import { tileSize } from '../../common/consts'
 
 function GenerateRandomSeed(length : number) {
   var result           = '';
@@ -20,24 +24,25 @@ function GenerateRandomSeed(length : number) {
 
 let randomSeed : string = GenerateRandomSeed(5)
 
-const dungeon = new Dungeon({
-    width: 200,
-    height: 200,
-    doorPadding: 3,
-    randomSeed: randomSeed,
-    rooms: {
-        width: { min: 30, max: 30 },
-        height: { min: 30, max: 30 },
-        maxRooms: 4,
-    }
-});
+const config = {
+  width: width,
+  height: height,
+  gravity: {
+    y: 0
+  }
+}
+
+//const physics = new ArcadePhysics(config)
+
+const dungeon = createDungeon.createDungeon(randomSeed)
+
 
 const getRandomRoom = () => {
-    const rooms = dungeon.rooms.slice()
-    const index = Math.floor(Math.random() * rooms.length);
+  const rooms = dungeon.rooms.slice()
+  const index = Math.floor(Math.random() * rooms.length);
 
-    var room = rooms[index]
-    return room
+  var room = rooms[index]
+  return room
 }
 
 type Player = {
@@ -127,7 +132,7 @@ app.get('/getState', (req, res) => {
     playerStates.push(prepareToSync(key))
   }
 
-  let states: State = {
+  let states: state.State = {
     playerStates: playerStates,
     dungeonSeed : randomSeed,
   }
