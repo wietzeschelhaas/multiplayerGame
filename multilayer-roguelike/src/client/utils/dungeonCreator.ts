@@ -58,8 +58,6 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
 
     //const mappedTiles = dungeon.getMappedTiles({ empty: empty, floor: floor, door: floor, wall: wall })
 
-    console.log(dungeon)
-
     //groundLayer.fill(floor)
     dungeon.rooms.forEach(room => {
         const { x, y, width, height, left, right, top, bottom } = room;
@@ -73,15 +71,9 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
 
         wallLayer.fill(bottomWall, left + 1, top + 1, width - 2, 1); // Top
 
-       // var r2 = scene.add.rectangle(((left + 1) * 16) + (width-2) * 8, ((top + 1)*16) + 8, (width - 2)*16, 1 * 16,0x6666ff); // Top
-
-        //scene.physics.add.existing(r2,true)
 
         wallLayer.fill(leftWall, left + 1, top + 1, 1, height - 2); // Left
 
-        //var r3 = scene.add.rectangle(((left + 1)*16) + 8, ((top + 1)*16)+ (height-2) * 8, 16, (height - 2)*16,0x6666ff); // Left
-
-        //scene.physics.add.existing(r3,true)
 
 
         wallLayer.fill(rightWall, right, top + 1, 1, height - 2); // Right
@@ -126,6 +118,19 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
 
     });
 
+
+    let staticGroup = createCollisionRects(scene,dungeon)
+
+    //wallLayer.setCollisionByExclusion([-1, floor]);
+    return { wallLayer: wallLayer, chests: chests, dungeonRooms: dungeon.rooms, collisionGroup: staticGroup }
+
+}
+
+const createCollisionRects =  (scene: Phaser.Scene, dungeon) => {
+
+
+    let staticGroup = scene.physics.add.staticGroup();
+
     var mappedTiles = dungeon.getMappedTiles({
         empty: 0,
         floor: 1,
@@ -135,41 +140,69 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
 
     dungeon.rooms.forEach(room => {
         const { x, y, width, height, left, right, top, bottom } = room;
-       
-        const doors = room.getDoorLocations(); // → Returns an array of {x, y} objects
-
-        for (var i = 0; i < doors.length; i++) {
-            if (doors[i].y === 0) {
-                var leftOfDoor = scene.add.rectangle(((left) * 16) + ((doors[i].x) * 8) + 8 , ((top + 1) * 16) + 8, (doors[i].x -1) * 16, 1 * 16, 0x6666ff); // Top
-                var rightOfdoor = scene.add.rectangle(doors[i].x * 16 + ((doors[i].x) * 8) + 8 , ((top + 1) * 16) + 8, (width - (doors[i].x -1)) * 16, 1 * 16, 0x6666ff); // Top
-                //TODO continue here
-                console.log(doors[i]) 
-                console.log(room)
-                console.log(tileSize)
-                scene.physics.add.existing(leftOfDoor, true)
-
-                // var r2 = scene.add.rectangle(((left + 1) * 16) + (width-2) * 8, ((top + 1)*16) + 8, (width - 2)*16, 1 * 16,0x6666ff); // Top
-            }
-        }
-        
-    });
     
-    /*dungeon.tiles.forEach((row,rowIndex) => {
-        row.forEach((col, colIndex) => {
-            if(mappedTiles[colIndex][rowIndex] == 3){
-
-                let halfTileSize = 16 / 2
-                var r2 = scene.add.rectangle((rowIndex * 16) + halfTileSize , (colIndex *16) + halfTileSize, 16, 16, 0x6666ff); // Top
+        for (var i = left; i < left + width; i++) { //top wall
+            if (mappedTiles[top][i] == 3){
+                //we have a door width of 2 tiles, the underlying dungeon has not...
+                if(mappedTiles[top][i+1] == 2){
+                    continue
+                }
+                var r2 = scene.add.rectangle(((i+1)* 16) + halfTileSize , (top+1) *16 + halfTileSize, 16, 16, 0x6666ff,0.3); 
 
                 scene.physics.add.existing(r2, true)
-                console.log(dungeon.getRoomAt(rowIndex,colIndex));
+                scene.physics.world.enableBody(r2,Phaser.Physics.Arcade.STATIC_BODY)
+                staticGroup.add(r2)
+                
             }
-        })
-    });*/
+        }
+        for (var i = left; i < left + width; i++) { //bottom wall
+            if (mappedTiles[bottom][i] == 3){
+                //we have a door width of 2 tiles, the underlying dungeon has not...
+                if(mappedTiles[bottom][i+1] == 2){
+                    continue
+                }
+                var r2 = scene.add.rectangle(((i+1)* 16) + halfTileSize , (bottom) *16 + halfTileSize, 16, 16, 0x6666ff,0.3); 
 
-    wallLayer.setCollisionByExclusion([-1, floor]);
-    return { wallLayer: wallLayer, chests: chests, dungeonRooms: dungeon.rooms }
+                scene.physics.add.existing(r2, true)
+                scene.physics.world.enableBody(r2,Phaser.Physics.Arcade.STATIC_BODY)
+                staticGroup.add(r2)
+                
+            }
+        }
+        for (var i = top; i < top + height; i++) { //left wall
+            if (mappedTiles[i][left] == 3){
+                //we have a door width of 2 tiles, the underlying dungeon has not...
+                if(mappedTiles[i+1][left] == 2){
+                    continue
+                }
+                var r2 = scene.add.rectangle((left +1)*16 + halfTileSize, ((i+1)* 16) + halfTileSize, 16, 16, 0x6666ff,0.3); 
 
+                scene.physics.add.existing(r2, true)
+                scene.physics.world.enableBody(r2,Phaser.Physics.Arcade.STATIC_BODY)
+                staticGroup.add(r2)
+                
+            }
+
+        }
+        for (var i = top; i < top + height; i++) { //right wall
+            if (mappedTiles[i][right] == 3){
+                //we have a door width of 2 tiles, the underlying dungeon has not...
+                if(mappedTiles[i+1][right] == 2){
+                    continue
+                }
+                var r2 = scene.add.rectangle(right*16 + halfTileSize, ((i+1)* 16) + halfTileSize, 16, 16, 0x6666ff,0.3); 
+
+                scene.physics.add.existing(r2, true)
+                scene.physics.world.enableBody(r2,Phaser.Physics.Arcade.STATIC_BODY)
+                staticGroup.add(r2)
+                
+            }
+
+        }
+    
+    });
+
+    return staticGroup
 }
 
 export {

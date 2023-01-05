@@ -98,6 +98,9 @@ export default class Game extends Phaser.Scene {
         this.currentPlayer = new Player(this, this.spawnPosX, this.spawnPosY, 'playerAtlas', 'run-side-4.png')
         this.cameras.main.startFollow(this.currentPlayer, true)
 
+        this.physics.add.collider(this.currentPlayer,dungeon.collisionGroup)
+
+
         this.channel.on('onUpdate', playerData => {
             this.handlePlayerUpdate(playerData)
         })

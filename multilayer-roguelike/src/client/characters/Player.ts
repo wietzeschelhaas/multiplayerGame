@@ -46,33 +46,34 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         const isMoving = leftDown || rightDown || upDown || downDown
 
-        const speed = 2;
+        const speed = 200;
         if (leftDown) {
             this.anims.play('faune-run-side', true)
-            this.x -= speed
+            this.setVelocityX(-speed)
 
             this.scaleX = -1
             //this.body.offset.x = 24
         }
         if (rightDown) {
             this.anims.play('faune-run-side', true)
-            this.x += speed
+            this.setVelocityX(speed)
 
             this.scaleX = 1
             //this.body.offset.x = 8
         }
         if (upDown) {
             this.anims.play('faune-run-up', true)
-            this.y -= speed
+            this.setVelocityY(-speed)
         }
         if (downDown) {
             this.anims.play('faune-run-down', true)
-            this.y += speed
+            this.setVelocityY(speed)
         }
         if (!isMoving) {
             const parts = this.anims.currentAnim.key.split('-')
             parts[1] = 'idle'
             this.anims.play(parts.join('-'))
+            this.setVelocity(0,0)
         }
     }
 }
