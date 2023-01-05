@@ -119,17 +119,18 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
     });
 
 
-    let staticGroup = createCollisionRects(scene,dungeon)
+    //let staticGroup = createCollisionRects(scene,dungeon)
 
     //wallLayer.setCollisionByExclusion([-1, floor]);
-    return { wallLayer: wallLayer, chests: chests, dungeonRooms: dungeon.rooms, collisionGroup: staticGroup }
+    return { wallLayer: wallLayer, chests: chests, dungeonRooms: dungeon.rooms}
 
 }
 
+// Can use this for testing, this can draw a collision rect!
+
 const createCollisionRects =  (scene: Phaser.Scene, dungeon) => {
 
-
-    let staticGroup = scene.physics.add.staticGroup();
+    const staticRects = [];
 
     var mappedTiles = dungeon.getMappedTiles({
         empty: 0,
@@ -151,7 +152,7 @@ const createCollisionRects =  (scene: Phaser.Scene, dungeon) => {
 
                 scene.physics.add.existing(r2, true)
                 scene.physics.world.enableBody(r2,Phaser.Physics.Arcade.STATIC_BODY)
-                staticGroup.add(r2)
+                staticRects.push(r2)
                 
             }
         }
@@ -165,7 +166,7 @@ const createCollisionRects =  (scene: Phaser.Scene, dungeon) => {
 
                 scene.physics.add.existing(r2, true)
                 scene.physics.world.enableBody(r2,Phaser.Physics.Arcade.STATIC_BODY)
-                staticGroup.add(r2)
+                staticRects.push(r2)
                 
             }
         }
@@ -179,7 +180,7 @@ const createCollisionRects =  (scene: Phaser.Scene, dungeon) => {
 
                 scene.physics.add.existing(r2, true)
                 scene.physics.world.enableBody(r2,Phaser.Physics.Arcade.STATIC_BODY)
-                staticGroup.add(r2)
+                staticRects.push(r2)
                 
             }
 
@@ -194,7 +195,7 @@ const createCollisionRects =  (scene: Phaser.Scene, dungeon) => {
 
                 scene.physics.add.existing(r2, true)
                 scene.physics.world.enableBody(r2,Phaser.Physics.Arcade.STATIC_BODY)
-                staticGroup.add(r2)
+                staticRects.push(r2)
                 
             }
 
@@ -202,7 +203,7 @@ const createCollisionRects =  (scene: Phaser.Scene, dungeon) => {
     
     });
 
-    return staticGroup
+    return staticRects
 }
 
 export {

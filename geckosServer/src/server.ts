@@ -10,7 +10,7 @@ import state = require('../../common/dist/stateContract.js')
 import createDungeon = require('../../common/dungeonUtils')
 import { ArcadePhysics } from 'arcade-physics'
 
-import { tileSize } from '../../common/consts'
+import { tileSize,halfTileSize } from '../../common/consts'
 
 function GenerateRandomSeed(length : number) {
   var result           = '';
@@ -25,16 +25,110 @@ function GenerateRandomSeed(length : number) {
 let randomSeed : string = GenerateRandomSeed(5)
 
 const config = {
-  width: width,
-  height: height,
-  gravity: {
-    y: 0
+  sys: {
+    game: {
+      config: {}
+    },
+    settings: {
+      physics: {
+        debug: true,
+        gravity: {
+          x: 0,
+          y: 0
+        }
+      }
+    },
+    scale: {
+      width: width,
+      height: height
+    },
+    queueDepthSort: () => { }
   }
 }
+const createCollisionRects =  (physics:ArcadePhysics, dungeon) => {
 
-//const physics = new ArcadePhysics(config)
+    const staticRects = [];
+
+    var mappedTiles = dungeon.getMappedTiles({
+        empty: 0,
+        floor: 1,
+        door: 2,
+        wall: 3
+    });
+
+    dungeon.rooms.forEach(room => {
+        const { x, y, width, height, left, right, top, bottom } = room;
+    
+        for (var i = left; i < left + width; i++) { //top wall
+            if (mappedTiles[top][i] == 3){
+                //we have a door width of 2 tiles, the underlying dungeon has not...
+                if(mappedTiles[top][i+1] == 2){
+                    continue
+                }
+                var r2 = physics.add.staticBody(((i+1)* 16) + halfTileSize , (top+1) *16 + halfTileSize, 16, 16); 
+
+                staticRects.push(r2)
+                
+            }
+        }
+        for (var i = left; i < left + width; i++) { //bottom wall
+            if (mappedTiles[bottom][i] == 3){
+                //we have a door width of 2 tiles, the underlying dungeon has not...
+                if(mappedTiles[bottom][i+1] == 2){
+                    continue
+                }
+                var r2 = physics.add.staticBody(((i+1)* 16) + halfTileSize , (bottom) *16 + halfTileSize, 16, 16); 
+
+                staticRects.push(r2)
+                
+            }
+        }
+        for (var i = top; i < top + height; i++) { //left wall
+            if (mappedTiles[i][left] == 3){
+                //we have a door width of 2 tiles, the underlying dungeon has not...
+                if(mappedTiles[i+1][left] == 2){
+                    continue
+                }
+                var r2 = physics.add.staticBody((left +1)*16 + halfTileSize, ((i+1)* 16) + halfTileSize, 16, 16 ); 
+
+                staticRects.push(r2)
+                
+            }
+
+        }
+        for (var i = top; i < top + height; i++) { //right wall
+            if (mappedTiles[i][right] == 3){
+                //we have a door width of 2 tiles, the underlying dungeon has not...
+                if(mappedTiles[i+1][right] == 2){
+                    continue
+                }
+                var r2 = physics.add.staticBody(right*16 + halfTileSize, ((i+1)* 16) + halfTileSize, 16, 16); 
+
+                staticRects.push(r2)
+                
+            }
+
+        }
+    
+    });
+
+    return staticRects
+}
+
+
+const physics = new ArcadePhysics(config)
 
 const dungeon = createDungeon.createDungeon(randomSeed)
+
+//let staticRects = createCollisionRects(physics,dungeon)
+
+let tick = 0
+const update = () => {
+  physics.world.update(tick * 1000, 1000 / 60)
+  tick++
+
+}
+setInterval(update,1000/60)
 
 
 const getRandomRoom = () => {
@@ -49,6 +143,7 @@ type Player = {
   posX: number;
   posY: number;
   directoin: string;
+  body: any;
 }
 
 let players: { [id: string]: Player } = {};
@@ -75,8 +170,18 @@ const main = async () => {
     let randomRoom = getRandomRoom()
     //send spawn point
     io.room(channel.roomId).emit('ready', `${randomRoom.centerX},${randomRoom.centerY}`)
+    
+    const player = physics.add.body(randomRoom.centerX*16, randomRoom.centerY*16, 32, 32)
+    
+    for (let key in players) {
+      physics.add.collider(player,players[key].body)
+    }
 
-    players[channel.id!] = { posX: randomRoom.centerX*16, posY: randomRoom.centerY*16, directoin: 's' }
+    /*staticRects.forEach((rect) => {
+      physics.add.collider(player,rect)
+    });*/
+
+    players[channel.id!] = { posX: randomRoom.centerX*16, posY: randomRoom.centerY*16, directoin: 's',body: player }
 
 
     channel.onDisconnect(() => {
@@ -89,31 +194,38 @@ const main = async () => {
 
     channel.on('posUpdate', data => {
       let playerMovement = data.toString().split(',');
-      const velocity = 2;
+      const velocity = 200;
 
       if (playerMovement[1] === '1') {
-        players[channel.id!].posX += velocity;
+        players[channel.id!].body.setVelocityX(velocity)
         players[channel.id!].directoin = 'r';
 
       } if (playerMovement[2] === '1') {
-        players[channel.id!].posX -= velocity;
+        //players[channel.id!].posX -= velocity;
+        players[channel.id!].body.setVelocityX(-velocity)
         players[channel.id!].directoin = '1';
       }
 
       if (playerMovement[3] === '1') {
-        players[channel.id!].posY -= velocity;
+        //players[channel.id!].posY -= velocity;
+        players[channel.id!].body.setVelocityY(-velocity)
         players[channel.id!].directoin = 'u';
 
       } if (playerMovement[4] === '1') {
-        players[channel.id!].posY += velocity;
+        players[channel.id!].body.setVelocityY(velocity)
+        //players[channel.id!].posY += velocity;
         players[channel.id!].directoin = 'd';
       }
       if (!isMoving()) {
+        players[channel.id!].body.setVelocity(0,0)
         players[channel.id!].directoin = 's';
       }
       function isMoving() {
         return playerMovement[1] === '1' || playerMovement[2] === '1' || playerMovement[3] === '1' || playerMovement[4] === '1'
       }
+
+      players[channel.id!].posX = players[channel.id!].body.x;
+      players[channel.id!].posY = players[channel.id!].body.y;
 
       let playerState = prepareToSync(channel.id!)
 

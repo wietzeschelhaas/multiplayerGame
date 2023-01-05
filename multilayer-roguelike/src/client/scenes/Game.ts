@@ -42,6 +42,9 @@ export default class Game extends Phaser.Scene {
         this.playerSessionId = this.channel.id
         this.initState = initalState
 
+        console.log(this.spawnPosX)
+        console.log(this.spawnPosY)
+
     }
 
     preload() {
@@ -55,8 +58,10 @@ export default class Game extends Phaser.Scene {
         let direction = playerUpdate[3]
 
         if (networkedPlayerId === this.playerSessionId) {
-            this.currentPlayer.remoteRef.x = posX
-            this.currentPlayer.remoteRef.y = posY
+            //this.currentPlayer.remoteRef.x = posX
+            //this.currentPlayer.remoteRef.y = posY
+            this.currentPlayer.x = posX
+            this.currentPlayer.y = posY
 
         } else if (Object.keys(this.playerEntities).includes(networkedPlayerId)) {
 
@@ -98,7 +103,7 @@ export default class Game extends Phaser.Scene {
         this.currentPlayer = new Player(this, this.spawnPosX, this.spawnPosY, 'playerAtlas', 'run-side-4.png')
         this.cameras.main.startFollow(this.currentPlayer, true)
 
-        this.physics.add.collider(this.currentPlayer,dungeon.collisionGroup)
+        //this.physics.add.collider(this.currentPlayer,dungeon.collisionGroup)
 
 
         this.channel.on('onUpdate', playerData => {
@@ -115,7 +120,6 @@ export default class Game extends Phaser.Scene {
 
             }
         })
-
     }
 
     update(t: number, dt: number) {
