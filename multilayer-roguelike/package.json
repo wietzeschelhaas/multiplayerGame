@@ -18,10 +18,10 @@
 		"eslint": "^6.8.0",
 		"minimist": ">=1.2.2",
 		"parcel-plugin-clean-easy": "^1.0.2",
-		"parcel-plugin-static-files-copy": "^2.4.3",
+		"parcel-plugin-static-files-copy": "^2.6.0",
 		"ts-node": "^8.1.0",
 		"ts-node-dev": "^1.0.0-pre.63",
-		"typescript": "^3.8.3"
+		"typescript": "^5.1.6"
 	},
 	"dependencies": {
 		"@geckos.io/client": "^2.2.3",
@@ -38,7 +38,7 @@
 		"dist"
 	],
 	"staticFiles": {
-		"staticPath": "./Public",
+		"staticPath": "./public",
 		"watcherGlob": "**"
 	}
 }

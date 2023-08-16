@@ -33,23 +33,23 @@ export default class GameUI extends Phaser.Scene {
             quantity: 3
         })
 
-        sceneEvents.on(GameEvents.PLAYER_HEALTH_CHANGED, this.handlePlayerHealthChanged, this)
+        //sceneEvents.on(GameEvents.PLAYER_HEALTH_CHANGED, this.handlePlayerHealthChanged, this)
 
         // if we dont do this cleanup, every time we recreate this scene, we will register another player health changed event, and it will emit twice
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            sceneEvents.off(GameEvents.PLAYER_HEALTH_CHANGED, this.handlePlayerHealthChanged, this)
+            //sceneEvents.off(GameEvents.PLAYER_HEALTH_CHANGED, this.handlePlayerHealthChanged, this)
             sceneEvents.off(GameEvents.PLAYER_COINS_CHANGED)
         })
     }
 
-    private handlePlayerHealthChanged(health: number) {
-        this.hearts.children.each((go, idx) => {
-            const heart = go as Phaser.GameObjects.Image
-            if (idx < health) {
-                heart.setTexture('ui-heart-full')
-            } else {
-                heart.setTexture('ui-heart-empty')
-            }
-        })
-    }
+    //private handlePlayerHealthChanged(health: number) {
+        //this.hearts.children.each((go, idx) => {
+            //const heart = go as Phaser.GameObjects.Image
+            //if (idx < health) {
+                //heart.setTexture('ui-heart-full')
+            //} else {
+                //heart.setTexture('ui-heart-empty')
+            //}
+        //})
+    //}
 }
