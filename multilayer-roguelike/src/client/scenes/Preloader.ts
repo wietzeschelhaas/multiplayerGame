@@ -28,9 +28,10 @@ export default class Preloader extends Phaser.Scene {
     }
     async create() {
 
-        const channel = geckos({ port: 3000 })
+        const channel = geckos({ port: 3002,url:'http://192.168.1.164'})
 
-        let initalState = await axios.get(`${location.protocol}//${location.hostname}:3000/getState`)
+        //let initalState = await axios.get(`${location.protocol}//${location.hostname}:3000/getState`)
+        let initalState = await axios.get(`http://192.168.1.164:3002/getState`)
 
         channel.onConnect(error => {
             if (error) console.error(error.message)

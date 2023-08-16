@@ -15,3 +15,11 @@ export const createDungeon = (randomSeed: string) =>{
 
     return dungeon
 }
+
+export const getRandomRoom = (dungeon : Dungeon) => {
+  const rooms = dungeon.rooms.slice()
+  const index = Math.floor(Math.random() * rooms.length);
+
+  var room = rooms[index]
+  return room
+}

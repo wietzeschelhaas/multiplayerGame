@@ -7,7 +7,7 @@ import {width,height } from '../../common/consts'
 
 import state = require('../../common/dist/stateContract.js')
 
-import createDungeon = require('../../common/dungeonUtils')
+import {createDungeon,getRandomRoom } from '../../common/dungeonUtils'
 import { ArcadePhysics } from 'arcade-physics'
 
 import { tileSize,halfTileSize } from '../../common/consts'
@@ -118,7 +118,7 @@ const createCollisionRects =  (physics:ArcadePhysics, dungeon) => {
 
 const physics = new ArcadePhysics(config)
 
-const dungeon = createDungeon.createDungeon(randomSeed)
+const dungeon = createDungeon(randomSeed)
 
 //let staticRects = createCollisionRects(physics,dungeon)
 
@@ -131,13 +131,6 @@ const update = () => {
 setInterval(update,1000/60)
 
 
-const getRandomRoom = () => {
-  const rooms = dungeon.rooms.slice()
-  const index = Math.floor(Math.random() * rooms.length);
-
-  var room = rooms[index]
-  return room
-}
 
 type Player = {
   posX: number;
@@ -167,7 +160,7 @@ const main = async () => {
   io.onConnection(channel => {
     console.log('player connected with id : ' + channel.id)
 
-    let randomRoom = getRandomRoom()
+    let randomRoom = getRandomRoom(dungeon)
     //send spawn point
     io.room(channel.roomId).emit('ready', `${randomRoom.centerX},${randomRoom.centerY}`)
     

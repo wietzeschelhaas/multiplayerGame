@@ -2,7 +2,6 @@ import Phaser from 'phaser'
 
 import { debugDraw } from '../utils/debug'
 import { generateDungeon} from '../utils/dungeonCreator'
-import { createLizardAnims } from '../anims/EnemyAnims'
 import { createCharacterAnims } from '../anims/CharacterAnims'
 import { createChestAnims } from '../anims/TreasureAnims'
 
