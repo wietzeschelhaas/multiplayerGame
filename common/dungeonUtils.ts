@@ -7,9 +7,9 @@ export const createDungeon = (randomSeed: string) =>{
         doorPadding: 3,
         randomSeed:randomSeed,
         rooms: {
-            width: { min: 30, max: 30 },
-            height: { min: 30, max: 30 },
-            maxRooms: 4,
+            width: { min: 20, max: 45 },
+            height: { min: 18, max: 40 },
+            maxRooms: 10,
         }
     });
 

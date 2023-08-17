@@ -32,6 +32,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         scene.add.existing(this)
         scene.physics.world.enableBody(this, Phaser.Physics.Arcade.DYNAMIC_BODY)
+        this.setSize(10,10)
         this.anims.play('faune-idle-down')
     }
     update() {
@@ -53,14 +54,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             //this.setVelocityX(-speed)
 
             this.scaleX = -1
-            //this.body.offset.x = 24
+            this.body.offset.x = 24
         }
         if (rightDown) {
             this.anims.play('faune-run-side', true)
             //this.setVelocityX(speed)
 
             this.scaleX = 1
-            //this.body.offset.x = 8
+            this.body.offset.x = 8
         }
         if (upDown) {
             this.anims.play('faune-run-up', true)

@@ -82,11 +82,7 @@ export default class Game extends Phaser.Scene {
         createChestAnims(this.anims)
 
         const dungeon = generateDungeon(this,this.initState.dungeonSeed)
-
-        // make player spawn in random room
-        // const x = dungeon.wallLayer.tileToWorldX(room.centerX) + 1
-        //const y = dungeon.wallLayer.tileToWorldY(room.centerY)
-
+        
         debugDraw(dungeon.wallLayer, this)
 
         for (let i = 0; i < this.initState.playerStates.length; i++) {
@@ -101,9 +97,6 @@ export default class Game extends Phaser.Scene {
 
         this.currentPlayer = new Player(this, this.spawnPosX, this.spawnPosY, 'playerAtlas', 'run-side-4.png')
         this.cameras.main.startFollow(this.currentPlayer, true)
-
-        //this.physics.add.collider(this.currentPlayer,dungeon.collisionGroup)
-
 
         this.channel.on('onUpdate', playerData => {
             this.handlePlayerUpdate(playerData)

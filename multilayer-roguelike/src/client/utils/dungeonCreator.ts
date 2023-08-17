@@ -110,16 +110,16 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
         const X = stuffLayer.tileToWorldX(room.centerX)
         const Y = stuffLayer.tileToWorldY(room.centerY)
 
-        var r1 = scene.add.rectangle(X+50, Y, 40, 40, 0x6666ff);
-        scene.physics.add.existing(r1,true)
+        //var r1 = scene.add.rectangle(X+50, Y, 40, 40, 0x6666ff);
+        //scene.physics.add.existing(r1,true)
 
         
-        chests.get(X, Y, 'treasureAtlas', 'chest_empty_open_anim_f0.png')
+        //chests.get(X, Y, 'treasureAtlas', 'chest_empty_open_anim_f0.png')
 
     });
 
 
-    //let staticGroup = createCollisionRects(scene,dungeon)
+    let staticGroup = createCollisionRects(scene,dungeon)
 
     //wallLayer.setCollisionByExclusion([-1, floor]);
     return { wallLayer: wallLayer, chests: chests, dungeonRooms: dungeon.rooms}
@@ -166,6 +166,7 @@ const createCollisionRects =  (scene: Phaser.Scene, dungeon) => {
 
                 scene.physics.add.existing(r2, true)
                 scene.physics.world.enableBody(r2,Phaser.Physics.Arcade.STATIC_BODY)
+                
                 staticRects.push(r2)
                 
             }

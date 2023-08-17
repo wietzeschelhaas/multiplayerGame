@@ -12,7 +12,7 @@ export default class NetworkedPLayer extends Phaser.Physics.Arcade.Sprite {
         this.serverX = x
         this.serverY = y
         scene.add.existing(this)
-        scene.physics.world.enableBody(this, Phaser.Physics.Arcade.DYNAMIC_BODY)
+        //scene.physics.world.enableBody(this, Phaser.Physics.Arcade.DYNAMIC_BODY)
         this.anims.play('faune-idle-down')
 
     }
