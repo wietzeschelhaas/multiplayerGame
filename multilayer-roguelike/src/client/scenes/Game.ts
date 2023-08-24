@@ -10,6 +10,8 @@ import Player from '../characters/Player';
 import { ClientChannel } from '@geckos.io/client';
 
 import {State} from '../../../../common/stateContract'
+import { serverFps } from '../../../../common/consts'
+import { SnapshotInterpolation } from '@geckos.io/snapshot-interpolation'
 
 export default class Game extends Phaser.Scene {
     private currentPlayer: Player
@@ -29,6 +31,7 @@ export default class Game extends Phaser.Scene {
     playerEntities: { [sessionId: string]: NetworkedPLayer } = {};
 
     private channel: ClientChannel
+    //SI = new SnapshotInterpolation(serverFps)
 
     constructor() {
         super('game')

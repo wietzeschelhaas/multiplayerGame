@@ -50,13 +50,9 @@ const dungeon = createDungeon(randomSeed)
 
 let staticRects = createCollisionRects(physics,dungeon)
 
-let tick = 0
-const update = () => {
-  physics.world.update(tick * 1000, 1000 / 60)
-  tick++
+let playerStatesToSend = [];
 
-}
-setInterval(update,1000/60)
+let roomId;
 
 
 let players: { [id: string]: Player } = {};
@@ -73,10 +69,25 @@ const port = 3000
 
 const main = async () => {
   // import geckos as ESM
+
   const { geckos } = await import('@geckos.io/server')
   const io = geckos()
 
   io.addServer(server)
+  let tick = 0
+  const update = () => {
+    physics.world.update(tick * 1000, 1000 / 60)
+    tick++
+
+    //send state with 30 fps
+    if(tick % 10 == 0){
+
+      //TODO should probably only send newest state only
+      playerStatesToSend.forEach(state => {io.emit('onUpdate',state)})
+      playerStatesToSend = [];
+    }
+  }
+setInterval(update,1000/60)
 
   io.onConnection(channel => {
     console.log('player connected with id : ' + channel.id)
@@ -118,7 +129,7 @@ const main = async () => {
       } if (playerMovement[2] === '1') {
         //players[channel.id!].posX -= velocity;
         players[channel.id!].body.setVelocityX(-velocity)
-        players[channel.id!].directoin = '1';
+        players[channel.id!].directoin = 'l';
       }
 
       if (playerMovement[3] === '1') {
@@ -144,7 +155,9 @@ const main = async () => {
 
       let playerState = prepareToSync(channel.id!)
 
-      io.room(channel.roomId).emit('onUpdate', playerState)
+      playerStatesToSend.push(playerState);
+      roomId = channel.roomId;
+      //io.emit('onUpdate', playerState)
     })
   })
 
