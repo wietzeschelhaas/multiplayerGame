@@ -14,6 +14,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         up: false,
         down: false,
     };
+    
+    isMoving(){
+        return this.movementInput.left || this.movementInput.right || this.movementInput.down || this.movementInput.up
+    }
 
     getNetworkPayload(playerId) {
         return `${playerId},${this.movementInput.right ? 1 : 0},${this.movementInput.left ? 1 : 0},${this.movementInput.up ? 1 : 0},${this.movementInput.down ? 1 : 0}`
@@ -51,31 +55,31 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const speed = 200;
          if (leftDown) {
             this.anims.play('faune-run-side', true)
-            //this.setVelocityX(-speed)
+            this.setVelocityX(-speed)
 
             this.scaleX = -1
             this.body.offset.x = 24
         }
         if (rightDown) {
             this.anims.play('faune-run-side', true)
-            //this.setVelocityX(speed)
+            this.setVelocityX(speed)
 
             this.scaleX = 1
             this.body.offset.x = 8
         }
         if (upDown) {
             this.anims.play('faune-run-up', true)
-            //this.setVelocityY(-speed)
+            this.setVelocityY(-speed)
         }
         if (downDown) {
             this.anims.play('faune-run-down', true)
-            //this.setVelocityY(speed)
+            this.setVelocityY(speed)
         }
         if (!isMoving) {
             const parts = this.anims.currentAnim.key.split('-')
             parts[1] = 'idle'
             this.anims.play(parts.join('-'))
-            //this.setVelocity(0,0)
+            this.setVelocity(0,0)
         }
     }
 }

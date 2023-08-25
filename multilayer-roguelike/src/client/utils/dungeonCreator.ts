@@ -119,9 +119,11 @@ const generateDungeon = (scene: Phaser.Scene,randomSeed:string) => {
     });
 
 
+    //remove comment to draw the collision rects from the server,
+    // this code is not shared yet with the server!!
     let staticGroup = createCollisionRects(scene,dungeon)
 
-    //wallLayer.setCollisionByExclusion([-1, floor]);
+    wallLayer.setCollisionByExclusion([-1, floor]);
     return { wallLayer: wallLayer, chests: chests, dungeonRooms: dungeon.rooms}
 
 }

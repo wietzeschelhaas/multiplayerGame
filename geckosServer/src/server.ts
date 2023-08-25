@@ -11,6 +11,7 @@ import {createDungeon,getRandomRoom } from '../../common/dungeonUtils'
 import { ArcadePhysics } from 'arcade-physics'
 import { createCollisionRects } from './physics'
 import { GenerateRandomSeed } from './utils'
+import { SnapshotInterpolation } from '@geckos.io/snapshot-interpolation'
 
 type Player = {
   posX: number;
@@ -50,15 +51,19 @@ const dungeon = createDungeon(randomSeed)
 
 let staticRects = createCollisionRects(physics,dungeon)
 
-let playerStatesToSend = [];
+let playerStatesToSend: { [id: string]: string } = {};
 
-let roomId;
 
+const SI = new SnapshotInterpolation()
 
 let players: { [id: string]: Player } = {};
 
 function prepareToSync(playerId: string) {
   return `${playerId},${players[playerId].posX},${players[playerId].posY},${players[playerId].directoin},`
+}
+
+function clearObject(obj : Object){
+  for (var member in obj) delete obj[member];
 }
 
 const app = express()
@@ -79,12 +84,19 @@ const main = async () => {
     physics.world.update(tick * 1000, 1000 / 60)
     tick++
 
-    //send state with 30 fps
-    if(tick % 10 == 0){
+    let worldState = []
 
-      //TODO should probably only send newest state only
-      playerStatesToSend.forEach(state => {io.emit('onUpdate',state)})
-      playerStatesToSend = [];
+    //send state with less than 60 fps
+    if(tick % 2 == 0){
+
+      for (let key in players) {
+        worldState.push({id: key, x: players[key].posX, y: players[key].posY })
+        //io.emit('onUpdate',playerStatesToSend[key])
+      }
+      const snapshot = SI.snapshot.create(worldState)
+      SI.vault.add(snapshot);
+      io.emit('onUpdate',snapshot)
+
     }
   }
 setInterval(update,1000/60)
@@ -153,10 +165,8 @@ setInterval(update,1000/60)
       players[channel.id!].posX = players[channel.id!].body.x;
       players[channel.id!].posY = players[channel.id!].body.y;
 
-      let playerState = prepareToSync(channel.id!)
+      //let playerState = prepareToSync(channel.id!)
 
-      playerStatesToSend.push(playerState);
-      roomId = channel.roomId;
       //io.emit('onUpdate', playerState)
     })
   })

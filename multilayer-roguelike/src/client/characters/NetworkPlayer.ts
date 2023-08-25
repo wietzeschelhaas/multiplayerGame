@@ -18,8 +18,8 @@ export default class NetworkedPLayer extends Phaser.Physics.Arcade.Sprite {
     }
 
     update() {
-        this.x = Phaser.Math.Linear(this.x, this.serverX, 0.2);
-        this.y = Phaser.Math.Linear(this.y, this.serverY, 0.2);
+        //this.x = Phaser.Math.Linear(this.x, this.serverX, 0.2);
+        //this.y = Phaser.Math.Linear(this.y, this.serverY, 0.2);
 
 
         if (this.serverDirection === "u") {
