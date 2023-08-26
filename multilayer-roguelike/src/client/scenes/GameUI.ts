@@ -5,13 +5,25 @@ import { GameEvents } from "../events/GameEvents";
 
 export default class GameUI extends Phaser.Scene {
     private hearts!: Phaser.GameObjects.Group
+    private miniMap : Phaser.Cameras.Scene2D.Camera
     constructor() {
         super({ key: 'game-ui' })
     }
+    init({player, mainScene}) {
+        this.miniMap = mainScene.cameras.add(4, 10, 135, 110).setZoom(0.1).setName('mini');
+        this.miniMap.setBackgroundColor(0x002244);
+
+        this.miniMap.startFollow(player,true)
+
+    }
 
     create() {
-        this.add.image(6, 26, 'treasureAtlas', 'coin_anim_f0.png')
-        const coinsLabel = this.add.text(12, 20, '0', {
+        this.add.image(70, 130, 'treasureAtlas', 'coin_anim_f0.png')
+
+        //TODO find a way to not hardcode these numbers
+        let miniMap = this.add.image(150/2, 125/2, 'miniMap')
+        miniMap.setScale(150/miniMap.width,125 / miniMap.height)
+        const coinsLabel = this.add.text(76, 125, '0', {
             fontSize: '12'
         })
 
@@ -27,7 +39,7 @@ export default class GameUI extends Phaser.Scene {
             key: 'ui-heart-full',
             setXY: {
                 x: 10,
-                y: 10,
+                y: 130,
                 stepX: 16
             },
             quantity: 3

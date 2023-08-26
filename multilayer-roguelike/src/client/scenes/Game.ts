@@ -15,6 +15,7 @@ import { SnapshotInterpolation, Vault} from '@geckos.io/snapshot-interpolation'
 
 export default class Game extends Phaser.Scene {
     private currentPlayer: Player
+    private miniMap : Phaser.Cameras.Scene2D.Camera
 
     private playerSessionId: string
 
@@ -87,7 +88,8 @@ export default class Game extends Phaser.Scene {
     }*/
 
     async create() {
-        this.scene.run('game-ui')
+
+
         createCharacterAnims(this.anims)
         createChestAnims(this.anims)
 
@@ -107,6 +109,10 @@ export default class Game extends Phaser.Scene {
         }
 
         this.currentPlayer = new Player(this, this.spawnPosX, this.spawnPosY, 'playerAtlas', 'run-side-4.png')
+
+        this.scene.run('game-ui', {player: this.currentPlayer, mainScene: this})
+
+
         this.cameras.main.startFollow(this.currentPlayer, true)
 
         //add collision for player with walls

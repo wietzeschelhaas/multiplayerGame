@@ -3,7 +3,7 @@ import express from 'express'
 import http from 'http'
 import cors from 'cors'
 
-import {width,height } from '../../common/consts'
+import {config} from '../../common/consts'
 
 import state = require('../../common/dist/stateContract.js')
 
@@ -12,37 +12,11 @@ import { ArcadePhysics } from 'arcade-physics'
 import { createCollisionRects } from './physics'
 import { GenerateRandomSeed } from './utils'
 import { SnapshotInterpolation } from '@geckos.io/snapshot-interpolation'
+import { Player, handlePlayerInput} from './playerLogic'
 
-type Player = {
-  posX: number;
-  posY: number;
-  directoin: string;
-  body: any;
-}
 
 let randomSeed : string = GenerateRandomSeed(5)
 
-const config = {
-  sys: {
-    game: {
-      config: {}
-    },
-    settings: {
-      physics: {
-        debug: true,
-        gravity: {
-          x: 0,
-          y: 0
-        }
-      }
-    },
-    scale: {
-      width: width,
-      height: height
-    },
-    queueDepthSort: () => { }
-  }
-}
 
 
 const physics = new ArcadePhysics(config)
@@ -51,19 +25,12 @@ const dungeon = createDungeon(randomSeed)
 
 let staticRects = createCollisionRects(physics,dungeon)
 
-let playerStatesToSend: { [id: string]: string } = {};
-
-
 const SI = new SnapshotInterpolation()
 
 let players: { [id: string]: Player } = {};
 
 function prepareToSync(playerId: string) {
   return `${playerId},${players[playerId].posX},${players[playerId].posY},${players[playerId].directoin},`
-}
-
-function clearObject(obj : Object){
-  for (var member in obj) delete obj[member];
 }
 
 const app = express()
@@ -80,13 +47,15 @@ const main = async () => {
 
   io.addServer(server)
   let tick = 0
+
+  // server loop
   const update = () => {
     physics.world.update(tick * 1000, 1000 / 60)
     tick++
 
     let worldState = []
 
-    //send state with less than 60 fps
+    //send state with 30 fps
     if(tick % 2 == 0){
 
       for (let key in players) {
@@ -132,38 +101,7 @@ setInterval(update,1000/60)
 
     channel.on('posUpdate', data => {
       let playerMovement = data.toString().split(',');
-      const velocity = 200;
-
-      if (playerMovement[1] === '1') {
-        players[channel.id!].body.setVelocityX(velocity)
-        players[channel.id!].directoin = 'r';
-
-      } if (playerMovement[2] === '1') {
-        //players[channel.id!].posX -= velocity;
-        players[channel.id!].body.setVelocityX(-velocity)
-        players[channel.id!].directoin = 'l';
-      }
-
-      if (playerMovement[3] === '1') {
-        //players[channel.id!].posY -= velocity;
-        players[channel.id!].body.setVelocityY(-velocity)
-        players[channel.id!].directoin = 'u';
-
-      } if (playerMovement[4] === '1') {
-        players[channel.id!].body.setVelocityY(velocity)
-        //players[channel.id!].posY += velocity;
-        players[channel.id!].directoin = 'd';
-      }
-      if (!isMoving()) {
-        players[channel.id!].body.setVelocity(0,0)
-        players[channel.id!].directoin = 's';
-      }
-      function isMoving() {
-        return playerMovement[1] === '1' || playerMovement[2] === '1' || playerMovement[3] === '1' || playerMovement[4] === '1'
-      }
-
-      players[channel.id!].posX = players[channel.id!].body.x;
-      players[channel.id!].posY = players[channel.id!].body.y;
+      handlePlayerInput(players,channel.id!,playerMovement);
 
       //let playerState = prepareToSync(channel.id!)
 
@@ -175,6 +113,7 @@ setInterval(update,1000/60)
     console.log(`Example app listening at http://localhost:${port}`)
   })
 }
+
 app.get('/getState', (req, res) => {
   let playerStates = []
 
